@@ -61,7 +61,7 @@ class CapaTransporte:
 
 
     def multiplexar(self,cadena):
-        cont = 1
+        cont = 0
         for u in cadena:
             self.lis = []
             self.n=u
@@ -71,6 +71,16 @@ class CapaTransporte:
             lista.append(self.lis)
             cont=cont+1
         print(lista)
+
+    def verificarllegada(self,lista):
+        listaAux=[]
+        for i in range(len(lista)):#((h,1),(o,2))
+            for aux in range(len(lista)):
+                obj1=lista[aux]
+                if i == int(obj1[1]):
+                    obj2=lista[aux]
+                    listaAux.append(obj2[0])
+        print(listaAux)
     """def hola():Esta aqui por que despues vemos como lo llamamos
         #messagebox.showinfo(title="Envio", message= "El mensaje "+entry_var.get()+ " sera enviado" )
         transporte = CapaTransporte()
@@ -259,7 +269,11 @@ def hola():
     men = ""
     print(entry_var.get())
     men = entry_var.get()
-    codi.decodificor( codi.codificar(men))
+    c=codi.codificar(men.upper())
+    codi.decodificor(c)
+    transporte = CapaTransporte()
+    transporte.multiplexar(c)
+    transporte.verificarllegada(lista)
 
 ventana.title("Cliente")
 ventana.minsize(800,600)
