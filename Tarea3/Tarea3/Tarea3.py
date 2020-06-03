@@ -86,7 +86,16 @@ class CapaTransporte:
         transporte = CapaTransporte()
         transporte.multiplexar(entry_var.get())"""
 
-
+class capaSesion:
+    def __init__(self):
+        self.c=None
+    def sesionIniciada(self):
+        self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.c.connect((Host, Puerto))
+        msg_rec = c.recv(1024)
+        print(msg_rec.decode('utf8') + "servidoor")
+        banSYN = "S"
+        self.c.send(banSYN.encode('ascii'))
 
 class CapaPresentacion:
     def __init__(self):
