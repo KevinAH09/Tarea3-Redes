@@ -47,8 +47,7 @@ CEROcodi = "♤"
 
 Host = "25.102.7.239"
 Puerto = 44440
-ventana = tk.Tk()
-entry_var = tk.StringVar()
+
 cadena = ""
 cadenaDecodi = ""
 lista = []
@@ -105,8 +104,8 @@ class CapaEnlaceDatos:
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux 
          print(lista)
-       
-                    
+     
+                   
 
 
 class CapaTransporte:
@@ -342,41 +341,40 @@ class CapaPresentacion:
                 cadenaDecodi = cadenaDecodi + i;
         print(cadenaDecodi)
 
+class CapaAplicacion():
+    def __init__(self):
+        self.men = ""
+        self.ventana = tk.Tk()
+        self.entry_var = tk.StringVar()
 
-def hola():
+    def EnvioMensaje(self):
+        print(self.entry_var.get())
+        self.men = self.entry_var.get()
+        codi = CapaPresentacion()
+        c=codi.codificar(self.men.upper())
    
-    men = ""
-    print(entry_var.get())
-    men = entry_var.get()
-    codi = CapaPresentacion()
-    c=codi.codificar(men.upper())
-   
+    def GUI(self):
+        self.ventana.title("Cliente")
+        self.ventana.minsize(800,600)
+        self.ventana.maxsize(800,600)
 
-ventana.title("Cliente")
-ventana.minsize(800,600)
-ventana.maxsize(800,600)
+        ruta = os.getcwd()
+        ruta1 = ruta.replace("\\", "\\\\")
 
-ruta = os.getcwd()
-ruta1 = ruta.replace("\\", "\\\\")
+        filename = tk.PhotoImage(file = ruta1+"\\\\fondo3.png")
+        background_label = tk.Label(self.ventana,bg="blue",image=filename)
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
+        texBox1 = tk.Label(self.ventana,text="Ingrese el mensaje",bg = "RoyalBlue3", fg = "black")
+        texBox1.place(x=350, y=150,width=100,height=30)
 
-filename = tk.PhotoImage(file = ruta1+"\\\\fondo3.png")
-background_label = tk.Label(ventana,bg="blue",image=filename)
-background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        entry = tk.Entry(self.ventana,textvariable = self.entry_var)
+        entry.place(x=150, y=300,width=500,height=20)
 
+        Button = tk.Button(self.ventana, text="ENVIAR", command=self.EnvioMensaje)
+        Button.place(x=350, y=350,width=100,height=20)
+        self.ventana.mainloop()
 
-texBox1 = tk.Label(ventana,text="Ingrese el mensaje",bg = "RoyalBlue3", fg = "black")
-texBox1.place(x=350, y=150,width=100,height=30)
-
-entry = tk.Entry(ventana,textvariable = entry_var)
-entry.place(x=150, y=300,width=500,height=20)
-
-Button = tk.Button(ventana, text="ENVIAR", command=hola)
-Button.place(x=350, y=350,width=100,height=20)
-
-
-
-
-
-ventana.mainloop()
+capaApli = CapaAplicacion()
+capaApli.GUI()
 
