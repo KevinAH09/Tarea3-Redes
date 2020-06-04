@@ -1,5 +1,5 @@
-import socket
 import tkinter as tk
+import socket
 import os
 from tkinter import messagebox
 Acodi="Ø" 
@@ -45,10 +45,8 @@ OCHOcodi = "∴"
 NUEVEcodi = "∷"
 CEROcodi = "♤"
 
-
 Host = "25.102.7.239"
 Puerto = 44440
-
 ventana = tk.Tk()
 entry_var = tk.StringVar()
 cadena = ""
@@ -64,7 +62,7 @@ class CapaTransporte:
 
 
     def multiplexar(self,cadena):
-        cont = 1
+        cont = 0
         for u in cadena:
             self.lis = []
             self.n=u
@@ -74,22 +72,40 @@ class CapaTransporte:
             lista.append(self.lis)
             cont=cont+1
         print(lista)
+
+    def verificarllegada(self,lista):
+        listaAux=[]
+        for i in range(len(lista)):#((h,1),(o,2))
+            for aux in range(len(lista)):
+                obj1=lista[aux]
+                if i == int(obj1[1]):
+                    obj2=lista[aux]
+                    listaAux.append(obj2[0])
+        print(listaAux)
     """def hola():Esta aqui por que despues vemos como lo llamamos
         #messagebox.showinfo(title="Envio", message= "El mensaje "+entry_var.get()+ " sera enviado" )
         transporte = CapaTransporte()
         transporte.multiplexar(entry_var.get())"""
 
-class capaSesion:
+class CapaSesion:
     def __init__(self):
         self.c=None
-    def sesionIniciada(self):
-        self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.c.connect((Host, Puerto))
-        msg_rec = c.recv(1024)
-        print(msg_rec.decode('utf8') + "servidoor")
-        banSYN = "S"
-        self.c.send(banSYN.encode('ascii'))
-
+    def sesionIniciada(self,cadena):
+        band = True
+        try:
+            self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.c.connect((Host, Puerto))
+            msg_rec = self.c.recv(1024)
+            banSYN = "S"
+            self.c.send(banSYN.encode('ascii'))
+        except:
+            messagebox.showerror(message="No se puede conectar con el servidor", title="ERROR DE CONEXION")
+            band = False
+        if band:
+            messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
+            transporte = CapaTransporte()
+            transporte.multiplexar(cadena)
+        
 
 class CapaPresentacion:
     def __init__(self):
@@ -179,7 +195,9 @@ class CapaPresentacion:
             else:
                 cadena = cadena + i;
         print(cadena)
-        return cadena
+        capaS = CapaSesion()
+        capaS.sesionIniciada(cadena)
+        
 
     def decodificor(self,mensaje):
         global cadenaDecodi
@@ -268,14 +286,13 @@ class CapaPresentacion:
 
 
 def hola():
-    sesion = capaSesion()
-    sesion.sesionIniciada()
-    """codi = CapaPresentacion()
+   
     men = ""
-    
     print(entry_var.get())
     men = entry_var.get()
-    codi.decodificor( codi.codificar(men.upper))"""
+    codi = CapaPresentacion()
+    c=codi.codificar(men.upper())
+   
 
 ventana.title("Cliente")
 ventana.minsize(800,600)
