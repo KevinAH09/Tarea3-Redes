@@ -51,17 +51,73 @@ ventana = tk.Tk()
 entry_var = tk.StringVar()
 cadena = ""
 cadenaDecodi = ""
-
 lista = []
-class CapaTransporte:
 
+def binario(a):
+    for s in a:
+
+       
+        b.append(r)
+    print(b)
+def decode_binary_string(s):
+    var = ''
+    w=len(s)
+    for i in range(len(s)//w):
+        var = chr(int(s[iw:iw+w], 2))
+    return var
+
+def decode_cadena():
+    palabra = ""
+    for l in b:
+            palabra = palabra+decode_binary_string(l)
+    print(palabra)
+
+class CapaEnlaceDatos:
+    def init(self):
+        self.listaAux=[]
+    def convertriBinario(self,lista):
+        for i in range(len(lista)):#((h,1
+            self.listaAux = lista[i]
+            obj1 = format(ord(self.listaAux[0]), 'b')
+            obj2 = format(ord(str(self.listaAux[1])), 'b')
+            self.listaAux[0] = obj1
+            self.listaAux[1] = obj2
+            lista[i] = self.listaAux 
+        print(lista)
+        return lista
+
+    def convertirOriginal(self,lista):
+         print(lista)
+         obj1=''
+         obj2 =''
+         for j in range(len(lista)):#((h,1
+            self.listaAux = lista[j]
+            s = self.listaAux[0]
+            w = len(self.listaAux[0])
+            for i in range(len(s)//w):
+                obj1 = chr(int(s[i*w:i*w+w], 2))
+            s = self.listaAux[1]
+            w = len(self.listaAux[1])
+            for i in range(len(s)//w):
+                obj2 = chr(int(s[i*w:i*w+w], 2))
+
+            self.listaAux[0] = obj1
+            self.listaAux[1] = int(obj2)
+            lista[j] = self.listaAux 
+         print(lista)
+       
+                    
+
+
+class CapaTransporte:
+    
     def init(self):
         self.n = ""
         self.id = 0
         self.lis = []
 
-
     def multiplexar(self,cadena):
+
         cont = 0
         for u in cadena:
             self.lis = []
@@ -71,7 +127,9 @@ class CapaTransporte:
             self.lis.append(cont)
             lista.append(self.lis)
             cont=cont+1
-        print(lista)
+        capaEnlace = CapaEnlaceDatos()
+        l= capaEnlace.convertriBinario(lista)
+        capaEnlace.convertirOriginal(l)
 
     def verificarllegada(self,lista):
         listaAux=[]
