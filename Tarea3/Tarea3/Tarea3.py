@@ -47,29 +47,11 @@ CEROcodi = "♤"
 
 Host = "25.102.7.239"
 Puerto = 44440
-
 cadena = ""
 cadenaDecodi = ""
 lista = []
 
-def binario(a):
-    for s in a:
 
-       
-        b.append(r)
-    print(b)
-def decode_binary_string(s):
-    var = ''
-    w=len(s)
-    for i in range(len(s)//w):
-        var = chr(int(s[iw:iw+w], 2))
-    return var
-
-def decode_cadena():
-    palabra = ""
-    for l in b:
-            palabra = palabra+decode_binary_string(l)
-    print(palabra)
 
 class CapaEnlaceDatos:
     def init(self):
