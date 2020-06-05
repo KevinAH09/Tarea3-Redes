@@ -51,8 +51,6 @@ cadena = ""
 cadenaDecodi = ""
 lista = []
 
-
-
 class CapaEnlaceDatos:
     def init(self):
         self.listaAux=[]
@@ -87,8 +85,6 @@ class CapaEnlaceDatos:
             lista[j] = self.listaAux 
          print(lista)
      
-                   
-
 
 class CapaTransporte:
     
