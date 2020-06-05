@@ -45,7 +45,7 @@ OCHOcodi = "∴"
 NUEVEcodi = "∷"
 CEROcodi = "♤"
 
-Host = "25.102.7.239"
+Host = "25.101.246.19"
 Puerto = 44440
 cadena = ""
 cadenaDecodi = ""
@@ -54,8 +54,30 @@ lista = []
 class CapaEnlaceDatos:
     def init(self):
         self.listaAux=[]
-    def convertriBinario(self,lista):
-        for i in range(len(lista)):#((h,1
+
+    def EnviarDatos(self,lista,c):
+        band = True
+        try:
+            for i in lista:
+                c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                c.connect((Host, Puerto))
+                msg_rec = c.recv(1024)
+                trama = i[0]+","+i[1]
+                print(trama)
+                c.send(trama.encode('ascii'))
+            c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            c.connect((Host, Puerto))
+            msg_rec = c.recv(1024)
+            m="F"
+            c.send(m.encode('ascii'))
+        except:
+            messagebox.showerror(message="No se puede conectar con el servidor", title="ERROR DE CONEXION")
+            band = False
+        if band:
+            messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
+
+    def convertriBinario(self,lista,c):
+        for i in range(len(lista)):
             self.listaAux = lista[i]
             obj1 = format(ord(self.listaAux[0]), 'b')
             obj2 = format(ord(str(self.listaAux[1])), 'b')
@@ -63,13 +85,13 @@ class CapaEnlaceDatos:
             self.listaAux[1] = obj2
             lista[i] = self.listaAux 
         print(lista)
-        return lista
+        self.EnviarDatos(lista,c)
 
     def convertirOriginal(self,lista):
         print(lista)
         obj1=''
         obj2 =''
-        for j in range(len(lista)):#((h,1
+        for j in range(len(lista)):
             self.listaAux = lista[j]
             s = self.listaAux[0]
             w = len(self.listaAux[0])
@@ -84,6 +106,8 @@ class CapaEnlaceDatos:
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux 
         print(lista)
+
+    
 class CapaRed:
      def init(self):
         self.c = ""
@@ -94,7 +118,7 @@ class CapaTransporte:
         self.id = 0
         self.lis = []
 
-    def multiplexar(self,cadena):
+    def multiplexar(self,cadena,c):
 
         cont = 0
         for u in cadena:
@@ -106,8 +130,7 @@ class CapaTransporte:
             lista.append(self.lis)
             cont=cont+1
         capaEnlace = CapaEnlaceDatos()
-        l= capaEnlace.convertriBinario(lista)
-        capaEnlace.convertirOriginal(l)
+        capaEnlace.convertriBinario(lista,c)
 
     def verificarllegada(self,lista):
         listaAux=[]
@@ -122,6 +145,7 @@ class CapaTransporte:
         #messagebox.showinfo(title="Envio", message= "El mensaje "+entry_var.get()+ " sera enviado" )
         transporte = CapaTransporte()
         transporte.multiplexar(entry_var.get())"""
+
 
 class CapaSesion:
     def __init__(self):
@@ -140,7 +164,7 @@ class CapaSesion:
         if band:
             messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
             transporte = CapaTransporte()
-            transporte.multiplexar(cadena)
+            transporte.multiplexar(cadena,self.c)
         
 
 class CapaPresentacion:
