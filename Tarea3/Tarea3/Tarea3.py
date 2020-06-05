@@ -1,6 +1,7 @@
 import tkinter as tk
 import socket
 import os
+import random
 from tkinter import messagebox
 Acodi="Ø" 
 Bcodi="Ω"
@@ -55,9 +56,49 @@ class CapaEnlaceDatos:
     def init(self):
         self.listaAux=[]
 
+    def escucharServidor(self,lista):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(("", 44440))
+        s.listen(5)
+        while True:
+            (c, addr) = s.accept()
+            print("Se establecio conexion con %s" % str(addr))
+            msg = 'Conexion establecida con : %s' % socket.gethostname + "\r\n"
+            c.send(msg.encode('utf8'))
+            msg_rec =c.recv(1024)
+            pala = msg_rec.decode('ascii')
+            if pala == "F":
+                print(pala)
+                c.close()
+            else:
+                band = True
+                cadena = ""
+                for i in pala:
+                    if i == "E" and band:
+                        print("Error")
+                        band=False
+                    elif band == False:
+                        cadena = cadena + i
+                self.listaAux=lista[int(cadena)]
+                c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                c.connect((Host, Puerto))
+                msg_rec = c.recv(1024)
+                trama = self.listaAux[0]+","+self.listaAux[1]
+                print(trama)
+                print(cadena)
+                c.send(trama.encode('ascii'))
+                c.close()
+
+                
+                    
+           
+      
     def EnviarDatos(self,lista,c):
         band = True
-        try:
+        for i in range(5):
+            a = random.randint(1,2)
+            print(a)
+        if a == 1: 
             for i in lista:
                 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 c.connect((Host, Puerto))
@@ -68,13 +109,31 @@ class CapaEnlaceDatos:
             c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             c.connect((Host, Puerto))
             msg_rec = c.recv(1024)
-            m="F"
+            m="F"+str(len(lista))
             c.send(m.encode('ascii'))
-        except:
-            messagebox.showerror(message="No se puede conectar con el servidor", title="ERROR DE CONEXION")
-            band = False
-        if band:
-            messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
+        else:
+            obj1 = ''
+            a = random.randint(0,len(lista)-1)
+            for i in lista:
+                n = i[1]
+                for j in range(len(n)//len(n)):
+                    obj1 = chr(int(n[j*len(n):j*len(n)+len(n)], 2))
+                print(obj1)
+                if int(obj1) != a:
+                    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    c.connect((Host, Puerto))
+                    msg_rec = c.recv(1024)
+                    trama = i[0]+","+i[1]
+                    print(trama)
+                    c.send(trama.encode('ascii'))
+            c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            c.connect((Host, Puerto))
+            msg_rec = c.recv(1024)
+            print("bosco1")
+            m="F"+str(len(lista))
+            c.send(m.encode('ascii'))
+            print("bosco2")
+        self.escucharServidor(lista)
 
     def convertriBinario(self,lista,c):
         for i in range(len(lista)):
@@ -86,6 +145,8 @@ class CapaEnlaceDatos:
             lista[i] = self.listaAux 
         print(lista)
         self.EnviarDatos(lista,c)
+
+
 
     def convertirOriginal(self,lista):
         print(lista)
