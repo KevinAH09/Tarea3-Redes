@@ -54,8 +54,12 @@ lista = []
 class CapaEnlaceDatos:
     def init(self):
         self.listaAux=[]
+        self.listaRec =[]
+        self.lenLis = 0
+        self.banWhile = True
+        self.clienteIPSesion = ""
     def convertriBinario(self,lista):
-        for i in range(len(lista)):#((h,1
+        for i in range(len(lista)):
             self.listaAux = lista[i]
             obj1 = format(ord(self.listaAux[0]), 'b')
             obj2 = format(ord(str(self.listaAux[1])), 'b')
@@ -65,7 +69,7 @@ class CapaEnlaceDatos:
         print(lista)
         return lista
 
-    def convertirOriginal(self,lista):
+    def convertirOriginal(self,lista,ipcliente):
         print(lista)
         obj1=''
         obj2 =''
@@ -84,15 +88,66 @@ class CapaEnlaceDatos:
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux
         print(lista)
+        capa = CapaTransporte()
+        capa.verificarllegada(lista,ipcliente)
+    def verificarError(self,lista,ipcliente):
+        if self.lenLis > len(lista):
+           
+            for i in range(self.lenLis):
+                band = False
+                for j in lista:
+                    obj2 = ''
+                    s = j[1]
+                    for n in range(len(s)//len(s)):
+                        obj2 = chr(int(s[n*len(s):n*len(s)+len(s)], 2))
+                    if i == int(obj2):
+                        band = True
+                if band == False:
+                    print(ipcliente)
+                    self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    self.c.connect((ipcliente, Puerto))
+                    msg_rec = self.c.recv(1024)
+                    banSYN = "E"+str(i)
+                    self.c.send(banSYN.encode('ascii'))
+                    self.c.close()
+                    self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    self.c.bind(("", Puerto))
+                    self.c.listen(1000)
+                    (c, addr) =  self.c.accept()
+                    print("Se establecio conexion con %s" % str(addr))
+                    msg = 'Conexion establecida con : %s' % socket.gethostname + "\r\n"
+                    c.send(msg.encode('utf8'))
+                    msg_rec =c.recv(1024)
+                    pala = msg_rec.decode('ascii')
+                    l =""
+                    n =""
+                    b = True
+                    for i in pala:
+                        if i == ",":
+                            b = False
+                        elif b:
+                            l = l+i
+                        else:
+                            n = n+i
+                    print(lista)
+                    lista.append([l,n])
+                    print(lista)
+                    self.c.close()
+                    self.convertirOriginal(lista,iipcliente)
+                    break
+        elif self.lenLis == len(lista):
+               self.convertirOriginal(lista,ipcliente)
+                
 
-    def iniciarServidor(host,IP_REENVIO, puerto):
+    def iniciarServidor(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(("", 44440))
         s.listen(1000)
         sesion = True
         clienteIPSesion= ""
         Lista = []
-        while True:
+        banWhile = True
+        while banWhile == True:
             (c, addr) = s.accept()
             print("Se establecio conexion con %s" % str(addr))
             msg = 'Conexion establecida con : %s' % socket.gethostname + "\r\n"
@@ -103,10 +158,15 @@ class CapaEnlaceDatos:
                 sesion = False
                 clienteIPSesion = str(addr[0])
             elif pala[0] == "F":
-                print(pala)
+                b = True
+                l = ""
+                for i in pala:
+                    if i != "F":
+                        l = l+i
+                self.lenLis = int(l)
                 sesion = True
-                clienteIPSesion = ""
                 c.close()
+                banWhile = False
             elif clienteIPSesion ==  str(addr[0]):
                 l =""
                 n =""
@@ -114,13 +174,16 @@ class CapaEnlaceDatos:
                 for i in pala:
                     if i == ",":
                         b = False
-                    if b:
+                    elif b:
                         l = l+i
                     else:
                         n = n+i
 
-                Lista.append([l,n])
-        print(Lista)
+                lista.append([l,n])
+                print(lista)
+        s.close()
+        self.verificarError(lista,clienteIPSesion)
+
             
 
         
@@ -149,15 +212,20 @@ class CapaTransporte:
         l= capaEnlace.convertriBinario(lista)
         capaEnlace.convertirOriginal(l)
 
-    def verificarllegada(self,lista):
+    def verificarllegada(self,lista,ipcliente):
         listaAux=[]
+        cadena = ""
         for i in range(len(lista)):#((h,1),(o,2))
             for aux in range(len(lista)):
                 obj1=lista[aux]
                 if i == int(obj1[1]):
                     obj2=lista[aux]
                     listaAux.append(obj2[0])
-        print(listaAux)
+        
+        for j  in listaAux:
+            cadena = cadena + j
+        capa = CapaSesion()
+        capa.sesionFinalizada(cadena,ipcliente)
     """def hola():Esta aqui por que despues vemos como lo llamamos
         #messagebox.showinfo(title="Envio", message= "El mensaje "+entry_var.get()+ " sera enviado" )
         transporte = CapaTransporte()
@@ -182,6 +250,16 @@ class CapaSesion:
             transporte = CapaTransporte()
             transporte.multiplexar(cadena)
         
+    def sesionFinalizada(self,cadena,ipcliente):
+        band = True
+        self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.c.connect((ipcliente, Puerto))
+        msg_rec = self.c.recv(1024)
+        banSYN = "F"
+        self.c.send(banSYN.encode('ascii'))
+        
+        capa = CapaPresentacion()
+        capa.decodificor(cadena)
 
 class CapaPresentacion:
     def __init__(self):
@@ -398,4 +476,4 @@ class CapaAplicacion():
 #capaApli.GUI()
 
 CapaEnlac = CapaEnlaceDatos()
-CapaEnlac.iniciarServidor("","");
+CapaEnlac.iniciarServidor();
