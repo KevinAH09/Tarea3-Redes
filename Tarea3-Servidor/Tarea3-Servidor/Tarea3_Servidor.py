@@ -102,7 +102,8 @@ class CapaEnlaceDatos:
             if (pala == "S" and sesion == True):
                 sesion = False
                 clienteIPSesion = str(addr[0])
-            elif pala == "F":
+            elif pala[0] == "F":
+                print(pala)
                 sesion = True
                 clienteIPSesion = ""
                 c.close()
@@ -119,7 +120,7 @@ class CapaEnlaceDatos:
                         n = n+i
 
                 Lista.append([l,n])
-            print(Lista)
+        print(Lista)
             
 
         
