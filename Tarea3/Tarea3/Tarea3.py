@@ -66,10 +66,10 @@ class CapaEnlaceDatos:
         return lista
 
     def convertirOriginal(self,lista):
-         print(lista)
-         obj1=''
-         obj2 =''
-         for j in range(len(lista)):#((h,1
+        print(lista)
+        obj1=''
+        obj2 =''
+        for j in range(len(lista)):#((h,1
             self.listaAux = lista[j]
             s = self.listaAux[0]
             w = len(self.listaAux[0])
@@ -83,9 +83,10 @@ class CapaEnlaceDatos:
             self.listaAux[0] = obj1
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux 
-         print(lista)
-     
-
+        print(lista)
+class CapaRed:
+     def init(self):
+        self.c = ""
 class CapaTransporte:
     
     def init(self):
