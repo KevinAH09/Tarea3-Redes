@@ -46,8 +46,6 @@ OCHOcodi = "∴"
 NUEVEcodi = "∷"
 CEROcodi = "♤"
 
-Host = "25.101.246.19"
-Puerto = 44440
 cadena = ""
 cadenaDecodi = ""
 lista = []
@@ -56,9 +54,9 @@ class CapaEnlaceDatos:
     def init(self):
         self.listaAux=[]
 
-    def escucharServidor(self,lista):
+    def escucharServidor(self,lista,host,puerto):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(("", 44440))
+        s.bind(("", puerto))
         s.listen(5)
         while True:
             (c, addr) = s.accept()
@@ -81,7 +79,7 @@ class CapaEnlaceDatos:
                         cadena = cadena + i
                 self.listaAux=lista[int(cadena)]
                 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                c.connect((Host, Puerto))
+                c.connect((host, puerto))
                 msg_rec = c.recv(1024)
                 trama = self.listaAux[0]+","+self.listaAux[1]
                 print(trama)
@@ -93,7 +91,7 @@ class CapaEnlaceDatos:
                     
            
       
-    def EnviarDatos(self,lista,c):
+    def EnviarDatos(self,lista,c,host,puerto):
         band = True
         for i in range(5):
             a = random.randint(1,2)
@@ -101,13 +99,13 @@ class CapaEnlaceDatos:
         if a == 1: 
             for i in lista:
                 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                c.connect((Host, Puerto))
+                c.connect((host, puerto))
                 msg_rec = c.recv(1024)
                 trama = i[0]+","+i[1]
                 print(trama)
                 c.send(trama.encode('ascii'))
             c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            c.connect((Host, Puerto))
+            c.connect((host, puerto))
             msg_rec = c.recv(1024)
             m="F"+str(len(lista))
             c.send(m.encode('ascii'))
@@ -121,21 +119,21 @@ class CapaEnlaceDatos:
                 print(obj1)
                 if int(obj1) != a:
                     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    c.connect((Host, Puerto))
+                    c.connect((host, puerto))
                     msg_rec = c.recv(1024)
                     trama = i[0]+","+i[1]
                     print(trama)
                     c.send(trama.encode('ascii'))
             c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            c.connect((Host, Puerto))
+            c.connect((host, puerto))
             msg_rec = c.recv(1024)
             print("bosco1")
             m="F"+str(len(lista))
             c.send(m.encode('ascii'))
             print("bosco2")
-        self.escucharServidor(lista)
+        self.escucharServidor(lista,host,puerto)
 
-    def convertriBinario(self,lista,c):
+    def convertriBinario(self,lista,c,host,puerto):
         for i in range(len(lista)):
             self.listaAux = lista[i]
             obj1 = format(ord(self.listaAux[0]), 'b')
@@ -144,7 +142,7 @@ class CapaEnlaceDatos:
             self.listaAux[1] = obj2
             lista[i] = self.listaAux 
         print(lista)
-        self.EnviarDatos(lista,c)
+        self.EnviarDatos(lista,c,host,puerto)
 
 
 
@@ -171,15 +169,18 @@ class CapaEnlaceDatos:
     
 class CapaRed:
      def init(self):
-        self.c = ""
+        self.HostDestino = "25.101.246.19"
+        self.HostOrigen = "25.102.7.239"
+        
 class CapaTransporte:
     
     def init(self):
         self.n = ""
         self.id = 0
         self.lis = []
+        self.Puerto = 44440
 
-    def multiplexar(self,cadena,c):
+    def multiplexar(self,cadena,c,hotsDestino,puerto):
 
         cont = 0
         for u in cadena:
@@ -191,7 +192,7 @@ class CapaTransporte:
             lista.append(self.lis)
             cont=cont+1
         capaEnlace = CapaEnlaceDatos()
-        capaEnlace.convertriBinario(lista,c)
+        capaEnlace.convertriBinario(lista,c,hotsDestino,puerto)
 
     def verificarllegada(self,lista):
         listaAux=[]
@@ -212,10 +213,12 @@ class CapaSesion:
     def __init__(self):
         self.c=None
     def sesionIniciada(self,cadena):
+        PDURed = CapaRed()
+        PDUTransprote = CapaTransporte()
         band = True
         try:
             self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.c.connect((Host, Puerto))
+            self.c.connect((PDURed.Host, PDUTransprote.Puerto))
             msg_rec = self.c.recv(1024)
             banSYN = "S"
             self.c.send(banSYN.encode('ascii'))
@@ -224,8 +227,7 @@ class CapaSesion:
             band = False
         if band:
             messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
-            transporte = CapaTransporte()
-            transporte.multiplexar(cadena,self.c)
+            PDUTransprote.multiplexar(cadena,self.c,PDURed.Host, PDUTransprote.Puerto)
         
 
 class CapaPresentacion:
