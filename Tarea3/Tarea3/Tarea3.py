@@ -58,7 +58,8 @@ class CapaEnlaceDatos:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(("", puerto))
         s.listen(5)
-        while True:
+        ban=True
+        while ban:
             (c, addr) = s.accept()
             print("Se establecio conexion con %s" % str(addr))
             msg = 'Conexion establecida con : %s' % socket.gethostname + "\r\n"
@@ -68,6 +69,7 @@ class CapaEnlaceDatos:
             if pala == "F":
                 print(pala)
                 c.close()
+                ban=False
             else:
                 band = True
                 cadena = ""
@@ -93,9 +95,7 @@ class CapaEnlaceDatos:
       
     def EnviarDatos(self,lista,c,host,puerto):
         band = True
-        for i in range(5):
-            a = random.randint(1,2)
-            print(a)
+        a = random.randint(0,len(lista)-1)
         if a == 1: 
             for i in lista:
                 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -114,9 +114,7 @@ class CapaEnlaceDatos:
             a = random.randint(0,len(lista)-1)
             for i in lista:
                 n = i[1]
-                for j in range(len(n)//len(n)):
-                    obj1 = chr(int(n[j*len(n):j*len(n)+len(n)], 2))
-                print(obj1)
+                obj1=int(n,2)
                 if int(obj1) != a:
                     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     c.connect((host, puerto))
@@ -134,14 +132,17 @@ class CapaEnlaceDatos:
         self.escucharServidor(lista,host,puerto)
 
     def convertriBinario(self,lista,c,host,puerto):
+        
         for i in range(len(lista)):
+            
             self.listaAux = lista[i]
+            print(self.listaAux[0])
+            print(self.listaAux[1])
             obj1 = format(ord(self.listaAux[0]), 'b')
-            obj2 = format(ord(str(self.listaAux[1])), 'b')
+            obj2 = format((self.listaAux[1]), 'b')
             self.listaAux[0] = obj1
             self.listaAux[1] = obj2
-            lista[i] = self.listaAux 
-        print(lista)
+            lista[i] = self.listaAux
         self.EnviarDatos(lista,c,host,puerto)
 
 
@@ -168,20 +169,23 @@ class CapaEnlaceDatos:
 
     
 class CapaRed:
-     def init(self):
-        self.HostDestino = "25.101.246.19"
+     def __init__(self):
+        self.HostDestino = "25.146.184.249"
         self.HostOrigen = "25.102.7.239"
         
 class CapaTransporte:
     
-    def init(self):
+    def __init__(self):
         self.n = ""
         self.id = 0
         self.lis = []
         self.Puerto = 44440
 
     def multiplexar(self,cadena,c,hotsDestino,puerto):
-
+        lista=[]
+        self.lis=[]
+        self.id=0
+        self.n=""
         cont = 0
         for u in cadena:
             self.lis = []
@@ -215,10 +219,13 @@ class CapaSesion:
     def sesionIniciada(self,cadena):
         PDURed = CapaRed()
         PDUTransprote = CapaTransporte()
+        print(PDURed.HostDestino)
+        print(PDUTransprote.Puerto)
         band = True
         try:
+            
             self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.c.connect((PDURed.Host, PDUTransprote.Puerto))
+            self.c.connect((PDURed.HostDestino,PDUTransprote.Puerto))
             msg_rec = self.c.recv(1024)
             banSYN = "S"
             self.c.send(banSYN.encode('ascii'))
@@ -227,7 +234,7 @@ class CapaSesion:
             band = False
         if band:
             messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
-            PDUTransprote.multiplexar(cadena,self.c,PDURed.Host, PDUTransprote.Puerto)
+            PDUTransprote.multiplexar(cadena,self.c,PDURed.HostDestino, PDUTransprote.Puerto)
         
 
 class CapaPresentacion:
@@ -236,6 +243,7 @@ class CapaPresentacion:
         cadenaDecodi = ""
     def codificar(self,mensaje):
         global cadena
+        cadena = ""
         for i in mensaje:
             if i == "A":
                 cadena = cadena + Acodi
@@ -317,7 +325,6 @@ class CapaPresentacion:
                 cadena = cadena + ESPACIOcodi
             else:
                 cadena = cadena + i;
-        print(cadena)
         capaS = CapaSesion()
         capaS.sesionIniciada(cadena)
         
@@ -417,6 +424,7 @@ class CapaAplicacion():
         print(self.entry_var.get())
         self.men = self.entry_var.get()
         codi = CapaPresentacion()
+        print(self.men)
         c=codi.codificar(self.men.upper())
    
     def GUI(self):
