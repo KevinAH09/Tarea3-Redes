@@ -50,6 +50,9 @@ Puerto = 44440
 cadena = ""
 cadenaDecodi = ""
 lista = []
+ventana = tk.Tk()
+TextoTexBox2 = tk.StringVar()
+texBox2 = None
 
 class CapaEnlaceDatos:
     def init(self):
@@ -436,44 +439,42 @@ class CapaPresentacion:
                 cadenaDecodi = cadenaDecodi + " "
             else:
                 cadenaDecodi = cadenaDecodi + i;
-        print(cadenaDecodi)
+     
+        texto.set(cadenaDecodi)
+        texBox2.config(textvariable=texto) 
 
 class CapaAplicacion():
     def __init__(self):
         self.men = ""
-        self.ventana = tk.Tk()
-        self.entry_var = tk.StringVar()
+        
 
-    def EnvioMensaje(self):
-        print(self.entry_var.get())
-        self.men = self.entry_var.get()
-        codi = CapaPresentacion()
-        c=codi.codificar(self.men.upper())
+    def ServidorIniciado(self):
+        CapaEnlac = CapaEnlaceDatos()
+        CapaEnlac.iniciarServidor();
    
     def GUI(self):
-        self.ventana.title("Cliente")
-        self.ventana.minsize(800,600)
-        self.ventana.maxsize(800,600)
+        ventana.title("Cliente")
+        ventana.minsize(800,600)
+        ventana.maxsize(800,600)
 
         ruta = os.getcwd()
         ruta1 = ruta.replace("\\", "\\\\")
 
         filename = tk.PhotoImage(file = ruta1+"\\\\fondo3.png")
-        background_label = tk.Label(self.ventana,bg="blue",image=filename)
+        background_label = tk.Label(ventana,bg="blue",image=filename)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        texBox1 = tk.Label(self.ventana,text="Ingrese el mensaje",bg = "RoyalBlue3", fg = "black")
+        texBox1 = tk.Label(ventana,text="Menseje a Recibir",bg = "RoyalBlue3", fg = "black")
         texBox1.place(x=350, y=150,width=100,height=30)
 
-        entry = tk.Entry(self.ventana,textvariable = self.entry_var)
-        entry.place(x=150, y=300,width=500,height=20)
+        texBox2 = tk.Label(ventana,text="",bg = "RoyalBlue3", fg = "black")
+        texBox2.place(x=350, y=250,width=100,height=30)
+        
 
-        Button = tk.Button(self.ventana, text="ENVIAR", command=self.EnvioMensaje)
+        Button = tk.Button(ventana, text="INICIAR", command=self.ServidorIniciado)
         Button.place(x=350, y=350,width=100,height=20)
-        self.ventana.mainloop()
+        ventana.mainloop()
 
-#capaApli = CapaAplicacion()
-#capaApli.GUI()
 
-CapaEnlac = CapaEnlaceDatos()
-CapaEnlac.iniciarServidor();
+capaApli = CapaAplicacion()
+capaApli.GUI()
