@@ -69,6 +69,7 @@ class CapaEnlaceDatos:
             self.listaAux[0] = obj1
             self.listaAux[1] = obj2
             lista[i] = self.listaAux 
+        
         print(lista)
         return lista
 
@@ -90,6 +91,7 @@ class CapaEnlaceDatos:
             self.listaAux[0] = obj1
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux
+        print("Capa Enlace")
         print(lista)
         capa = CapaTransporte()
         capa.verificarllegada(lista,ipcliente)
@@ -136,7 +138,7 @@ class CapaEnlaceDatos:
                     lista.append([l,n])
                     print(lista)
                     self.c.close()
-                    self.convertirOriginal(lista,iipcliente)
+                    self.convertirOriginal(lista,ipcliente)
                     break
         elif self.lenLis == len(lista):
                self.convertirOriginal(lista,ipcliente)
@@ -149,6 +151,7 @@ class CapaEnlaceDatos:
         sesion = True
         clienteIPSesion= ""
         Lista = []
+        lista = []
         banWhile = True
         while banWhile == True:
             (c, addr) = s.accept()
@@ -168,7 +171,6 @@ class CapaEnlaceDatos:
                         l = l+i
                 self.lenLis = int(l)
                 sesion = True
-                c.close()
                 banWhile = False
             elif clienteIPSesion ==  str(addr[0]):
                 l =""
@@ -227,6 +229,7 @@ class CapaTransporte:
         
         for j  in listaAux:
             cadena = cadena + j
+        print(cadena)
         capa = CapaSesion()
         capa.sesionFinalizada(cadena,ipcliente)
     """def hola():Esta aqui por que despues vemos como lo llamamos
@@ -358,6 +361,7 @@ class CapaPresentacion:
 
     def decodificor(self,mensaje):
         global cadenaDecodi
+        cadenaDecodi = ""
         for i in mensaje:
             if i == Acodi:
                 cadenaDecodi = cadenaDecodi + "A"
@@ -439,9 +443,10 @@ class CapaPresentacion:
                 cadenaDecodi = cadenaDecodi + " "
             else:
                 cadenaDecodi = cadenaDecodi + i;
-     
-        texto.set(cadenaDecodi)
-        texBox2.config(textvariable=texto) 
+        print(cadenaDecodi)
+        texBox2 = tk.Label(ventana,text=cadenaDecodi,bg = "RoyalBlue3", fg = "black")
+        texBox2.place(x=350, y=250,width=100,height=30)
+        ventana.update()
 
 class CapaAplicacion():
     def __init__(self):
@@ -449,6 +454,11 @@ class CapaAplicacion():
         
 
     def ServidorIniciado(self):
+        cadena = ""
+        cadenaDecodi = ""
+        texBox2 = tk.Label(ventana,text=" ",bg = "RoyalBlue3", fg = "black")
+        texBox2.place(x=350, y=250,width=100,height=30)
+        ventana.update()
         CapaEnlac = CapaEnlaceDatos()
         CapaEnlac.iniciarServidor();
    
@@ -467,7 +477,7 @@ class CapaAplicacion():
         texBox1 = tk.Label(ventana,text="Menseje a Recibir",bg = "RoyalBlue3", fg = "black")
         texBox1.place(x=350, y=150,width=100,height=30)
 
-        texBox2 = tk.Label(ventana,text="",bg = "RoyalBlue3", fg = "black")
+        texBox2 = tk.Label(ventana,text="sdfsd",bg = "RoyalBlue3", fg = "black")
         texBox2.place(x=350, y=250,width=100,height=30)
         
 
