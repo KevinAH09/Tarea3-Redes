@@ -83,11 +83,8 @@ class CapaEnlaceDatos:
             w = len(self.listaAux[0])
             for i in range(len(s)//w):
                 obj1 = chr(int(s[i*w:i*w+w], 2))
-            s = self.listaAux[1]
-            w = len(self.listaAux[1])
-            for i in range(len(s)//w):
-                obj2 = chr(int(s[i*w:i*w+w], 2))
-
+            s = self.listaAux[1]         
+            obj2 = int(s, 2)
             self.listaAux[0] = obj1
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux
@@ -103,8 +100,7 @@ class CapaEnlaceDatos:
                 for j in lista:
                     obj2 = ''
                     s = j[1]
-                    for n in range(len(s)//len(s)):
-                        obj2 = chr(int(s[n*len(s):n*len(s)+len(s)], 2))
+                    obj2 = int(s, 2)
                     if i == int(obj2):
                         band = True
                 if band == False:
