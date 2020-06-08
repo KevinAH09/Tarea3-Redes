@@ -84,8 +84,6 @@ class CapaEnlaceDatos:
                 c.connect((host, puerto))
                 msg_rec = c.recv(1024)
                 trama = self.listaAux[0]+","+self.listaAux[1]
-                print(trama)
-                print(cadena)
                 c.send(trama.encode('ascii'))
                 c.close()
 
@@ -102,7 +100,6 @@ class CapaEnlaceDatos:
                 c.connect((host, puerto))
                 msg_rec = c.recv(1024)
                 trama = i[0]+","+i[1]
-                print(trama)
                 c.send(trama.encode('ascii'))
             c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             c.connect((host, puerto))
@@ -120,15 +117,12 @@ class CapaEnlaceDatos:
                     c.connect((host, puerto))
                     msg_rec = c.recv(1024)
                     trama = i[0]+","+i[1]
-                    print(trama)
                     c.send(trama.encode('ascii'))
             c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             c.connect((host, puerto))
             msg_rec = c.recv(1024)
-            print("bosco1")
             m="F"+str(len(lista))
             c.send(m.encode('ascii'))
-            print("bosco2")
         self.escucharServidor(lista,host,puerto)
 
     def convertriBinario(self,lista,c,host,puerto):
@@ -136,8 +130,6 @@ class CapaEnlaceDatos:
         for i in range(len(lista)):
             
             self.listaAux = lista[i]
-            print(self.listaAux[0])
-            print(self.listaAux[1])
             obj1 = format(ord(self.listaAux[0]), 'b')
             obj2 = format((self.listaAux[1]), 'b')
             self.listaAux[0] = obj1
@@ -148,7 +140,6 @@ class CapaEnlaceDatos:
 
 
     def convertirOriginal(self,lista):
-        print(lista)
         obj1=''
         obj2 =''
         for j in range(len(lista)):
@@ -165,12 +156,11 @@ class CapaEnlaceDatos:
             self.listaAux[0] = obj1
             self.listaAux[1] = int(obj2)
             lista[j] = self.listaAux 
-        print(lista)
 
     
 class CapaRed:
      def __init__(self):
-        self.HostDestino = "25.146.184.249"
+        self.HostDestino = "25.101.246.19"
         self.HostOrigen = "25.102.7.239"
         
 class CapaTransporte:
@@ -198,20 +188,6 @@ class CapaTransporte:
         capaEnlace = CapaEnlaceDatos()
         capaEnlace.convertriBinario(lista,c,hotsDestino,puerto)
 
-    def verificarllegada(self,lista):
-        listaAux=[]
-        for i in range(len(lista)):#((h,1),(o,2))
-            for aux in range(len(lista)):
-                obj1=lista[aux]
-                if i == int(obj1[1]):
-                    obj2=lista[aux]
-                    listaAux.append(obj2[0])
-        print(listaAux)
-    """def hola():Esta aqui por que despues vemos como lo llamamos
-        #messagebox.showinfo(title="Envio", message= "El mensaje "+entry_var.get()+ " sera enviado" )
-        transporte = CapaTransporte()
-        transporte.multiplexar(entry_var.get())"""
-
 
 class CapaSesion:
     def __init__(self):
@@ -219,8 +195,6 @@ class CapaSesion:
     def sesionIniciada(self,cadena):
         PDURed = CapaRed()
         PDUTransprote = CapaTransporte()
-        print(PDURed.HostDestino)
-        print(PDUTransprote.Puerto)
         band = True
         try:
             
@@ -412,7 +386,6 @@ class CapaPresentacion:
                 cadenaDecodi = cadenaDecodi + " "
             else:
                 cadenaDecodi = cadenaDecodi + i;
-        print(cadenaDecodi)
 
 class CapaAplicacion():
     def __init__(self):
@@ -421,10 +394,8 @@ class CapaAplicacion():
         self.entry_var = tk.StringVar()
 
     def EnvioMensaje(self):
-        print(self.entry_var.get())
         self.men = self.entry_var.get()
         codi = CapaPresentacion()
-        print(self.men)
         c=codi.codificar(self.men.upper())
    
     def GUI(self):
