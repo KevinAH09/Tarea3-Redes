@@ -85,6 +85,7 @@ class CapaEnlaceDatos:
                 msg_rec = c.recv(1024)
                 trama = self.listaAux[0]+","+self.listaAux[1]
                 c.send(trama.encode('ascii'))
+                messagebox.showinfo(message="Mensaje con error pero solucionado correctamente", title="MENSAJE EXITOSO")
                 c.close()
 
                 
@@ -93,7 +94,8 @@ class CapaEnlaceDatos:
       
     def EnviarDatos(self,lista,c,host,puerto):
         band = True
-        a = random.randint(0,len(lista)-1)
+        a = random.randint(1,2)
+        print(a)
         if a == 1: 
             for i in lista:
                 c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -106,6 +108,7 @@ class CapaEnlaceDatos:
             msg_rec = c.recv(1024)
             m="F"+str(len(lista))
             c.send(m.encode('ascii'))
+            messagebox.showinfo(message="Mensaje enviado correctamente", title="MENSAJE EXITOSO")
         else:
             obj1 = ''
             a = random.randint(0,len(lista)-1)
@@ -197,7 +200,6 @@ class CapaSesion:
         PDUTransprote = CapaTransporte()
         band = True
         try:
-            
             self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.c.connect((PDURed.HostDestino,PDUTransprote.Puerto))
             msg_rec = self.c.recv(1024)
@@ -302,90 +304,6 @@ class CapaPresentacion:
         capaS = CapaSesion()
         capaS.sesionIniciada(cadena)
         
-
-    def decodificor(self,mensaje):
-        global cadenaDecodi
-        for i in mensaje:
-            if i == Acodi:
-                cadenaDecodi = cadenaDecodi + "A"
-            elif i == Bcodi:
-                cadenaDecodi = cadenaDecodi + "B"
-            elif i == Ccodi:
-                cadenaDecodi = cadenaDecodi + "C"
-            elif i == Dcodi:
-                cadenaDecodi = cadenaDecodi + "D"
-            elif i == Ecodi:
-                cadenaDecodi = cadenaDecodi + "E"
-            elif i == Fcodi:
-                cadenaDecodi = cadenaDecodi + "F"
-            elif i == Gcodi:
-                cadenaDecodi = cadenaDecodi + "G"
-            elif i == Hcodi:
-                cadenaDecodi = cadenaDecodi + "H"
-            elif i == Icodi:
-                cadenaDecodi = cadenaDecodi + "I"
-            elif i == Jcodi:
-                cadenaDecodi = cadenaDecodi + "J"
-            elif i == Kcodi:
-                cadenaDecodi = cadenaDecodi + "K"
-            elif i == Lcodi:
-                cadenaDecodi = cadenaDecodi + "L"
-            elif i == Mcodi:
-                cadenaDecodi = cadenaDecodi + "M"
-            elif i == Ncodi:
-                cadenaDecodi = cadenaDecodi + "N"
-            elif i == Ocodi:
-                cadenaDecodi = cadenaDecodi + "O"
-            elif i == Pcodi:
-                cadenaDecodi = cadenaDecodi + "P"
-            elif i == Qcodi:
-                cadenaDecodi = cadenaDecodi + "Q"
-            elif i == Rcodi:
-                cadenaDecodi = cadenaDecodi + "R"
-            elif i == Scodi:
-                cadenaDecodi = cadenaDecodi + "S"
-            elif i == Tcodi:
-                cadenaDecodi = cadenaDecodi + "T"
-            elif i == Ucodi:
-                cadenaDecodi = cadenaDecodi + "U"
-            elif i == Vcodi:
-                cadenaDecodi = cadenaDecodi + "V"
-            elif i == Wcodi:
-                cadenaDecodi = cadenaDecodi + "W"
-            elif i == Xcodi:
-                cadenaDecodi = cadenaDecodi + "X"
-            elif i == Ycodi:
-                cadenaDecodi = cadenaDecodi + "Y"
-            elif i == Zcodi:
-                cadenaDecodi = cadenaDecodi + "Z"
-            elif i == UNOcodi:
-                cadenaDecodi = cadenaDecodi + "1"
-            elif i == DOScodi:
-                cadenaDecodi = cadenaDecodi + "2"
-            elif i == TREScodi:
-                cadenaDecodi = cadenaDecodi + "3"
-            elif i == CUATROcodi:
-                cadenaDecodi = cadenaDecodi + "4"
-            elif i == CINCOcodi:
-                cadenaDecodi = cadenaDecodi + "5"
-            elif i == SEIScodi:
-                cadenaDecodi = cadenaDecodi + "6"
-            elif i == SIETEcodi:
-                cadenaDecodi = cadenaDecodi + "7"
-            elif i == OCHOcodi:
-                cadenaDecodi = cadenaDecodi + "8"
-            elif i == NUEVEcodi:
-                cadenaDecodi = cadenaDecodi + "9"
-            elif i == CEROcodi:
-                cadenaDecodi = cadenaDecodi + "0"
-            elif i == PUNTOcodi:
-                cadenaDecodi = cadenaDecodi + "."
-            elif i == COMAcodi:
-                cadenaDecodi = cadenaDecodi + ","
-            elif i == ESPACIOcodi:
-                cadenaDecodi = cadenaDecodi + " "
-            else:
-                cadenaDecodi = cadenaDecodi + i;
 
 class CapaAplicacion():
     def __init__(self):
