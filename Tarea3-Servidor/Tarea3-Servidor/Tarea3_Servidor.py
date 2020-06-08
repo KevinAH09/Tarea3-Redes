@@ -219,14 +219,16 @@ class CapaSesion:
       
     def sesionFinalizada(self,cadena,ipcliente,puerto):
         band = True
-        self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.c.connect((ipcliente, puerto))
-        msg_rec = self.c.recv(1024)
-        banSYN = "F"
-        self.c.send(banSYN.encode('ascii'))
-        
-        capa = CapaPresentacion()
-        capa.decodificor(cadena)
+        try:
+            self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.c.connect((ipcliente, puerto))
+            msg_rec = self.c.recv(1024)
+            banSYN = "F"
+            self.c.send(banSYN.encode('ascii'))
+            capa = CapaPresentacion()
+            capa.decodificor(cadena)
+        except:
+            messagebox.showerror(message="Error al cerrar sesion con el cliente", title="ERROR")
 
 class CapaPresentacion:
     def __init__(self):
@@ -346,7 +348,7 @@ class CapaAplicacion():
             CapaEnlac.iniciarServidor();
    
     def GUI(self):
-        ventana.title("Cliente")
+        ventana.title("Servidor")
         ventana.minsize(800,600)
         ventana.maxsize(800,600)
 
