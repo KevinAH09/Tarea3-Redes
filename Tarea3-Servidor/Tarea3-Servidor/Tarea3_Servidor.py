@@ -45,8 +45,6 @@ OCHOcodi = "∴"
 NUEVEcodi = "∷"
 CEROcodi = "♤"
 
-Host = "25.102.7.239"
-Puerto = 44440
 cadena = ""
 cadenaDecodi = ""
 lista = []
@@ -55,25 +53,16 @@ TextoTexBox2 = tk.StringVar()
 texBox2 = None
 
 class CapaEnlaceDatos:
-    def init(self):
+    def __init__(self):
         self.listaAux=[]
         self.listaRec =[]
         self.lenLis = 0
         self.banWhile = True
-        self.clienteIPSesion = ""
-    def convertriBinario(self,lista):
-        for i in range(len(lista)):
-            self.listaAux = lista[i]
-            obj1 = format(ord(self.listaAux[0]), 'b')
-            obj2 = format(ord(str(self.listaAux[1])), 'b')
-            self.listaAux[0] = obj1
-            self.listaAux[1] = obj2
-            lista[i] = self.listaAux 
-        
-        print(lista)
-        return lista
+        self.PDUCapaRed = CapaRed()
+        self.PDUCapaTransporte = CapaTransporte()
+   
 
-    def convertirOriginal(self,lista,ipcliente):
+    def convertirOriginal(self,lista):
         print(lista)
         obj1=''
         obj2 =''
@@ -90,11 +79,11 @@ class CapaEnlaceDatos:
             lista[j] = self.listaAux
         print("Capa Enlace")
         print(lista)
-        capa = CapaTransporte()
-        capa.verificarllegada(lista,ipcliente)
-    def verificarError(self,lista,ipcliente):
+        self.PDUCapaTransporte.verificarllegada(lista,self.PDUCapaRed.hostCliente)
+
+    def verificarError(self,lista):
         if self.lenLis > len(lista):
-           
+            messagebox.showinfo(message="Hubo un error con el mensaje recibido, pronto lo solucionaremos", title="Advertencia")
             for i in range(self.lenLis):
                 band = False
                 for j in lista:
@@ -104,15 +93,14 @@ class CapaEnlaceDatos:
                     if i == int(obj2):
                         band = True
                 if band == False:
-                    print(ipcliente)
                     self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    self.c.connect((ipcliente, Puerto))
+                    self.c.connect((self.PDUCapaRed.hostCliente, self.PDUCapaTransporte.Puerto))
                     msg_rec = self.c.recv(1024)
                     banSYN = "E"+str(i)
                     self.c.send(banSYN.encode('ascii'))
                     self.c.close()
                     self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    self.c.bind(("", Puerto))
+                    self.c.bind(("", self.PDUCapaTransporte.Puerto))
                     self.c.listen(1000)
                     (c, addr) =  self.c.accept()
                     print("Se establecio conexion con %s" % str(addr))
@@ -134,10 +122,10 @@ class CapaEnlaceDatos:
                     lista.append([l,n])
                     print(lista)
                     self.c.close()
-                    self.convertirOriginal(lista,ipcliente)
+                    self.convertirOriginal(lista)
                     break
         elif self.lenLis == len(lista):
-               self.convertirOriginal(lista,ipcliente)
+               self.convertirOriginal(lista)
                 
 
     def iniciarServidor(self):
@@ -158,7 +146,7 @@ class CapaEnlaceDatos:
             pala = msg_rec.decode('ascii')
             if (pala == "S" and sesion == True):
                 sesion = False
-                clienteIPSesion = str(addr[0])
+                self.PDUCapaRed.colocarIPs(str(addr[0]))
             elif pala[0] == "F":
                 b = True
                 l = ""
@@ -168,7 +156,7 @@ class CapaEnlaceDatos:
                 self.lenLis = int(l)
                 sesion = True
                 banWhile = False
-            elif clienteIPSesion ==  str(addr[0]):
+            elif self.PDUCapaRed.hostCliente ==  str(addr[0]):
                 l =""
                 n =""
                 b = True
@@ -183,35 +171,27 @@ class CapaEnlaceDatos:
                 lista.append([l,n])
                 print(lista)
         s.close()
-        self.verificarError(lista,clienteIPSesion)
+        self.verificarError(lista)
 
             
 
         
 class CapaRed:
-     def init(self):
-        self.c = ""
+    def init(self):
+        self.hostCliente = ""
+        self.hostServidor = "25.101.246.19"
+
+    def colocarIPs(self,ipcliente):
+        self.hostCliente = ipcliente
 class CapaTransporte:
     
-    def init(self):
+    def __init__(self):
         self.n = ""
         self.id = 0
         self.lis = []
+        self.Puerto = 44440
 
-    def multiplexar(self,cadena):
-
-        cont = 0
-        for u in cadena:
-            self.lis = []
-            self.n=u
-            self.id=cont
-            self.lis.append(u)
-            self.lis.append(cont)
-            lista.append(self.lis)
-            cont=cont+1
-        capaEnlace = CapaEnlaceDatos()
-        l= capaEnlace.convertriBinario(lista)
-        capaEnlace.convertirOriginal(l)
+    
 
     def verificarllegada(self,lista,ipcliente):
         listaAux=[]
@@ -227,7 +207,7 @@ class CapaTransporte:
             cadena = cadena + j
         print(cadena)
         capa = CapaSesion()
-        capa.sesionFinalizada(cadena,ipcliente)
+        capa.sesionFinalizada(cadena,ipcliente,self.Puerto)
     """def hola():Esta aqui por que despues vemos como lo llamamos
         #messagebox.showinfo(title="Envio", message= "El mensaje "+entry_var.get()+ " sera enviado" )
         transporte = CapaTransporte()
@@ -236,26 +216,11 @@ class CapaTransporte:
 class CapaSesion:
     def __init__(self):
         self.c=None
-    def sesionIniciada(self,cadena):
-        band = True
-        try:
-            self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.c.connect((Host, Puerto))
-            msg_rec = self.c.recv(1024)
-            banSYN = "S"
-            self.c.send(banSYN.encode('ascii'))
-        except:
-            messagebox.showerror(message="No se puede conectar con el servidor", title="ERROR DE CONEXION")
-            band = False
-        if band:
-            messagebox.showinfo(message="Conexion extablecida correctamente", title="CONEXION EXITOSA")
-            transporte = CapaTransporte()
-            transporte.multiplexar(cadena)
-        
-    def sesionFinalizada(self,cadena,ipcliente):
+      
+    def sesionFinalizada(self,cadena,ipcliente,puerto):
         band = True
         self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.c.connect((ipcliente, Puerto))
+        self.c.connect((ipcliente, puerto))
         msg_rec = self.c.recv(1024)
         banSYN = "F"
         self.c.send(banSYN.encode('ascii'))
@@ -267,94 +232,6 @@ class CapaPresentacion:
     def __init__(self):
         cadena = ""
         cadenaDecodi = ""
-    def codificar(self,mensaje):
-        global cadena
-        for i in mensaje:
-            if i == "A":
-                cadena = cadena + Acodi
-            elif i == "B":
-                cadena = cadena + Bcodi
-            elif i == "C":
-                cadena = cadena + Ccodi
-            elif i == "D":
-                cadena = cadena + Dcodi
-            elif i == "E":
-                cadena = cadena + Ecodi
-            elif i == "F":
-                cadena = cadena + Fcodi
-            elif i == "G":
-                cadena = cadena + Gcodi
-            elif i == "H":
-                cadena = cadena + Hcodi
-            elif i == "I":
-                cadena = cadena + Icodi
-            elif i == "J":
-                cadena = cadena + Jcodi
-            elif i == "K":
-                cadena = cadena + Kcodi
-            elif i == "L":
-                cadena = cadena + Lcodi
-            elif i == "M":
-                cadena = cadena + Mcodi
-            elif i == "N":
-                cadena = cadena + Ncodi
-            elif i == "O":
-                cadena = cadena + Ocodi
-            elif i == "P":
-                cadena = cadena + Pcodi
-            elif i == "Q":
-                cadena = cadena + Qcodi
-            elif i == "R":
-                cadena = cadena + Rcodi
-            elif i == "S":
-                cadena = cadena + Scodi
-            elif i == "T":
-                cadena = cadena + Tcodi
-            elif i == "U":
-                cadena = cadena + Ucodi
-            elif i == "V":
-                cadena = cadena + Vcodi
-            elif i == "W":
-                cadena = cadena + Wcodi
-            elif i == "X":
-                cadena = cadena + Xcodi
-            elif i == "Y":
-                cadena = cadena + Ycodi
-            elif i == "Z":
-                cadena = cadena + Zcodi
-            elif i == "1":
-                cadena = cadena + UNOcodi
-            elif i == "2":
-                cadena = cadena + DOScodi
-            elif i == "3":
-                cadena = cadena + TREScodi
-            elif i == "4":
-                cadena = cadena + CUATROcodi
-            elif i == "5":
-                cadena = cadena + CINCOcodi
-            elif i == "6":
-                cadena = cadena + SEIScodi
-            elif i == "7":
-                cadena = cadena + SIETEcodi
-            elif i == "8":
-                cadena = cadena + OCHOcodi
-            elif i == "9":
-                cadena = cadena + NUEVEcodi
-            elif i == "0":
-                cadena = cadena + CEROcodi
-            elif i == ".":
-                cadena = cadena + PUNTOcodi
-            elif i == ",":
-                cadena = cadena + COMAcodi
-            elif i == " ":
-                cadena = cadena + ESPACIOcodi
-            else:
-                cadena = cadena + i;
-        print(cadena)
-        capaS = CapaSesion()
-        capaS.sesionIniciada(cadena)
-        
-
     def decodificor(self,mensaje):
         global cadenaDecodi
         cadenaDecodi = ""
@@ -440,23 +317,33 @@ class CapaPresentacion:
             else:
                 cadenaDecodi = cadenaDecodi + i;
         print(cadenaDecodi)
-        texBox2 = tk.Label(ventana,text=cadenaDecodi,bg = "RoyalBlue3", fg = "black")
-        texBox2.place(x=350, y=250,width=100,height=30)
+        messagebox.showinfo(message="Mensaje recibido correctamente", title="Mensaje")
+        readOnlyText = tk.Text(ventana)
+        readOnlyText.insert(1.0,cadenaDecodi)
+        readOnlyText.configure(state='disabled')
+        readOnlyText.place(x=150, y=200,width=500,height=100)
+        texBox1 = tk.Label(ventana,text="Click en INICIAR, para activar el servidor",bg = "RoyalBlue3", fg = "black")
+        texBox1.place(x=295, y=100,width=210,height=30)
         ventana.update()
 
 class CapaAplicacion():
     def __init__(self):
         self.men = ""
         
-
+    
     def ServidorIniciado(self):
-        cadena = ""
-        cadenaDecodi = ""
-        texBox2 = tk.Label(ventana,text=" ",bg = "RoyalBlue3", fg = "black")
-        texBox2.place(x=350, y=250,width=100,height=30)
-        ventana.update()
-        CapaEnlac = CapaEnlaceDatos()
-        CapaEnlac.iniciarServidor();
+        if messagebox.askyesno(message="El servidor entrara en modo SERVIDOR ACTIVO ¿Desea continuar?", title="Advertencia"):
+            cadena = ""
+            cadenaDecodi = ""
+            readOnlyText = tk.Text(ventana)
+            readOnlyText.insert(1.0,"")
+            readOnlyText.configure(state='disabled')
+            readOnlyText.place(x=150, y=200,width=500,height=100)
+            texBox1 = tk.Label(ventana,text="Modo SERVIDOR ACTIVO",bg = "RoyalBlue3", fg = "black")
+            texBox1.place(x=295, y=100,width=210,height=30) 
+            ventana.update()
+            CapaEnlac = CapaEnlaceDatos()
+            CapaEnlac.iniciarServidor();
    
     def GUI(self):
         ventana.title("Cliente")
@@ -470,17 +357,20 @@ class CapaAplicacion():
         background_label = tk.Label(ventana,bg="blue",image=filename)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        texBox1 = tk.Label(ventana,text="Menseje a Recibir",bg = "RoyalBlue3", fg = "black")
-        texBox1.place(x=350, y=150,width=100,height=30)
-
-        texBox2 = tk.Label(ventana,text="sdfsd",bg = "RoyalBlue3", fg = "black")
-        texBox2.place(x=350, y=250,width=100,height=30)
+        texBox1 = tk.Label(ventana,text="Click en INICIAR, para activar el servidor",bg = "RoyalBlue3", fg = "black")
+        texBox1.place(x=295, y=100,width=210,height=30) 
         
+        readOnlyText = tk.Text(ventana)
+        readOnlyText.insert(1.0,"")
+        readOnlyText.configure(state='disabled')
+        readOnlyText.place(x=150, y=200,width=500,height=100)
 
         Button = tk.Button(ventana, text="INICIAR", command=self.ServidorIniciado)
         Button.place(x=350, y=350,width=100,height=20)
-        ventana.mainloop()
 
+        
+        ventana.mainloop()
+        
 
 capaApli = CapaAplicacion()
 capaApli.GUI()
