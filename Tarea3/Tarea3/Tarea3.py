@@ -77,6 +77,7 @@ class CapaEnlaceDatos:
                     if i == "E" and band:
                         print("Error")
                         band=False
+                        
                     elif band == False:
                         cadena = cadena + i
                 self.listaAux=lista[int(cadena)]
@@ -85,7 +86,6 @@ class CapaEnlaceDatos:
                 msg_rec = c.recv(1024)
                 trama = self.listaAux[0]+","+self.listaAux[1]
                 c.send(trama.encode('ascii'))
-                messagebox.showinfo(message="Mensaje con error pero solucionado correctamente", title="MENSAJE EXITOSO")
                 c.close()
 
                 
@@ -108,7 +108,7 @@ class CapaEnlaceDatos:
             msg_rec = c.recv(1024)
             m="F"+str(len(lista))
             c.send(m.encode('ascii'))
-            messagebox.showinfo(message="Mensaje enviado correctamente", title="MENSAJE EXITOSO")
+           
         else:
             obj1 = ''
             a = random.randint(0,len(lista)-1)
